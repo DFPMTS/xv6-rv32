@@ -2,10 +2,10 @@
 *.o
 *.img
 *.asm
-*.S
 *.sym
 *.out
 user/_*
+user/usys.S
 user/initcode
 kernel/kernel
 mkfs/mkfs
