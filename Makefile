@@ -48,7 +48,7 @@ endif
 
 QEMU = qemu-system-riscv32 -monitor telnet:127.0.0.1:55555,server,nowait 
 
-CC = $(TOOLPREFIX)gcc
+CC = $(TOOLPREFIX)gcc -march=rv32ima -mabi=ilp32
 AS = $(TOOLPREFIX)gas
 LD = $(TOOLPREFIX)ld
 OBJCOPY = $(TOOLPREFIX)objcopy
@@ -129,6 +129,7 @@ UPROGS=\
 	$U/_usertests\
 	$U/_wc\
 	$U/_zombie\
+	$U/_hello_world\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
@@ -176,7 +177,7 @@ qemu-gdb: $K/kernel .gdbinit fs.img
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
-	printf.c umalloc.c\
+	printf.c umalloc.c hello_world.c\
 	README dot-bochsrc *.pl \
 	.gdbinit.tmpl gdbutil\
 
