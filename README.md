@@ -23,3 +23,10 @@ Then I just executed:
 ```
 make qemu
 ```
+
+# Access QEMU with Telnet
+
+While running QEMU, on a different terminal run:
+```
+telnet localhost 55555
+```
