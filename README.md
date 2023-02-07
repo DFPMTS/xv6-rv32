@@ -9,3 +9,17 @@ original documentation in README.
 [2] https://github.com/mit-pdos/xv6-public
 [3] https://github.com/mit-pdos/xv6-riscv
 
+# Installation
+
+I just followed step by step the instructions from this repository 
+https://github.com/johnwinans/riscv-toolchain-install-guide without the GDB part. Installation may take ~6 GB from space and take like 1 hour to install.
+
+Yes, I know in that repo they install the __rv32i__ architecture, but they use multi-lib with the __rv32ima__ option, which is the one used to build xv6 (see Makefile in this repository).
+
+Tried in Ubuntu 20.04 (WSL2) and GCC 9.4.0 without issues.
+
+Then I just executed:
+
+```
+make qemu
+```
