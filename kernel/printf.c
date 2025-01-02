@@ -122,6 +122,8 @@ panic(char *s)
   printf(s);
   printf("\n");
   panicked = 1; // freeze other CPUs
+  asm volatile ("li a0, 1");
+  asm volatile ("ebreak");
   for(;;)
     ;
 }

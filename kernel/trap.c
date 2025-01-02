@@ -189,6 +189,7 @@ devintr()
     if(irq == UART0_IRQ){
       uartintr();
     } else if(irq == VIRTIO0_IRQ){
+      // panic("VIRTIO0_IRQ not implemented");
       virtio_disk_intr();
     } else {
     }

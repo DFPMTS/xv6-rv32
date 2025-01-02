@@ -35,6 +35,9 @@ kvminit()
   // virtio mmio disk interface
   kvmmap(VIRTIO0, VIRTIO0, PGSIZE, PTE_R | PTE_W);
 
+  // ramdisk
+  kvmmap(RAMDISK, RAMDISK, PGSIZE * 1024, PTE_R | PTE_W);
+
   // CLINT
   kvmmap(CLINT, CLINT, 0x10000, PTE_R | PTE_W);
 

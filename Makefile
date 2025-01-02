@@ -28,11 +28,12 @@ OBJS = \
   $K/sysfile.o \
   $K/kernelvec.o \
   $K/plic.o \
-  $K/virtio_disk.o
+  $K/ramdisk.o \
+	$K/virtio_disk.o
 
 # riscv32-unknown-elf- or riscv32-linux-gnu-
 # perhaps in /opt/riscv/bin
-TOOLPREFIX = riscv32-unknown-elf-
+TOOLPREFIX = riscv32-unknown-linux-gnu-
 
 # Try to infer the correct TOOLPREFIX if not set
 ifndef TOOLPREFIX
@@ -46,15 +47,15 @@ TOOLPREFIX := $(shell if riscv32-unknown-elf-objdump -i 2>&1 | grep 'elf64-big' 
 	echo "***" 1>&2; exit 1; fi)
 endif
 
-QEMU = qemu-system-riscv32 -monitor telnet:127.0.0.1:55555,server,nowait 
+QEMU = qemu-system-riscv32
 
-CC = $(TOOLPREFIX)gcc -march=rv32ima -mabi=ilp32
+CC = $(TOOLPREFIX)gcc -march=rv32ima_zicsr -mabi=ilp32
 AS = $(TOOLPREFIX)gas
 LD = $(TOOLPREFIX)ld
 OBJCOPY = $(TOOLPREFIX)objcopy
 OBJDUMP = $(TOOLPREFIX)objdump
 
-CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb
+CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb -g
 CFLAGS += -MD
 CFLAGS += -mcmodel=medany
 CFLAGS += -ffreestanding -fno-common -nostdlib -mno-relax
@@ -151,15 +152,20 @@ QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
 	then echo "-gdb tcp::$(GDBPORT)"; \
 	else echo "-s -p $(GDBPORT)"; fi)
 ifndef CPUS
-CPUS := 3
+CPUS := 1
 endif
 
 QEMUEXTRA = -drive file=fs1.img,if=none,format=raw,id=x1 -device virtio-blk-device,drive=x1,bus=virtio-mmio-bus.1
-QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 1024M -smp $(CPUS) -nographic
-QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+QEMUOPTS = -machine virt -bios none -kernel image.bin -m 1024M -smp $(CPUS) -nographic -S -s
 
-qemu: $K/kernel fs.img
-	$(QEMU) $(QEMUOPTS)
+image.bin: kernel.bin fs.img
+	./build.sh
+
+kernel.bin: $K/kernel
+	riscv32-unknown-linux-gnu-objcopy -O binary --set-section-flags .bss=alloc,load,contents $K/kernel kernel.bin
+
+qemu: image.bin fs.img
+	$(QEMU) $(QEMUOPTS) 
 
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@

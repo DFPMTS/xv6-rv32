@@ -100,7 +100,9 @@ consoleread(int user_dst, uint32 dst, int n)
         release(&cons.lock);
         return -1;
       }
-      sleep(&cons.r, &cons.lock);
+      int c;
+      while( (c = uartgetc()) == -1); // polling
+      consoleintr(c);
     }
 
     c = cons.buf[cons.r++ % INPUT_BUF];
@@ -142,7 +144,7 @@ consoleread(int user_dst, uint32 dst, int n)
 void
 consoleintr(int c)
 {
-  acquire(&cons.lock);
+  // acquire(&cons.lock);
 
   switch(c){
   case C('P'):  // Print process list.
@@ -176,13 +178,13 @@ consoleintr(int c)
         // wake up consoleread() if a whole line (or end-of-file)
         // has arrived.
         cons.w = cons.e;
-        wakeup(&cons.r);
+        // wakeup(&cons.r);
       }
     }
     break;
   }
   
-  release(&cons.lock);
+  // release(&cons.lock);
 }
 
 void

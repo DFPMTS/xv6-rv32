@@ -22,12 +22,14 @@ main()
     procinit();      // process table
     trapinit();      // trap vectors
     trapinithart();  // install kernel trap vector
-    plicinit();      // set up interrupt controller
-    plicinithart();  // ask PLIC for device interrupts
+    // plicinit();      // set up interrupt controller
+    // plicinithart();  // ask PLIC for device interrupts
     binit();         // buffer cache
     iinit();         // inode cache
     fileinit();      // file table
-    virtio_disk_init(); // emulated hard disk
+    ramdisk_init(); // emulated hard disk
+    // virtio_disk_init(); // emulated hard disk
+    // printf("virtio disk initialized\n");
     userinit();      // first user process
     __sync_synchronize();
     started = 1;
